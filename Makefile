@@ -15,7 +15,7 @@ SOURCES=src/smartcaps.c src/devices.c
 # SOURCES=$(wildcard src/*.c)
 
 # Targets
-all: $(DEBUG)
+all: $(RELEASE)
 
 .PHONY: release
 release: $(RELEASE)
