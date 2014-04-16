@@ -12,6 +12,37 @@
 /* Forward declarations */ 
 int devices_event_handlers(int *handlers, int *nhandlers, int max);
 
+static void await_keypress(int *fd, int nfd)
+{
+  fd_set readfds; 
+  int i;
+  int maxfd;
+  int ret;
+   
+  FD_ZERO(&readfds);
+
+  maxfd = 0; 
+  for(i = 0; i < nfd; i++) {
+    FD_SET(fd[i], &readfds);
+    if(fd[i] > maxfd)
+      maxfd = fd[i];
+  }
+
+  while(1) {
+    ret = select(maxfd + 1, &readfds, NULL, NULL, NULL);
+    if(ret == -1) {
+      log_warn("select() returned with error.");
+      continue;
+    }
+    for(i = 0; i < nfd; i++) {
+      if(FD_ISSET(fd[i], &readfds)) {
+        debug("Got keypress for fd = %d! Inteagrate with readkbd.c", fd[i]);
+        /* Data will need to be read here or select(...) will be spinning */
+      }
+    }
+  }
+}
+
 static int open_files(int *fd, int *handlers, int nhandlers)
 {
   char filename[FILENAME_LEN];
@@ -20,12 +51,13 @@ static int open_files(int *fd, int *handlers, int nhandlers)
 
   for(i = 0; i < nhandlers; i++) {
     snprintf(filename, FILENAME_LEN, "/dev/input/event%d", handlers[i]);
-    debug("Opening handler: %s", filename);
     fd[i] = open(filename, O_RDONLY);
-    if(fd[i] == -1)
+    if(fd[i] == -1) {
       log_warn("Could not open handler %s", filename);
-    else
+    } else {
       nfiles++;
+      debug("Opened handler: %s", filename);
+    }
   }
   
   return nfiles;
@@ -47,6 +79,8 @@ int main(int argc, char **argv)
    
   nfds = open_files(fds, handlers, nhandlers);
   check(nfds, "Could not open any file descriptors. Quitting.");
+
+  await_keypress(fds, nfds);
 
   return 0;
 
