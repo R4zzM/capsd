@@ -55,27 +55,11 @@ int devices_event_handlers(int *handlers, int *n, int nmax)
   }
   *n = i;
 
+  fclose(devices);
+
   return 0;
 
 err:
+  fclose(devices);
   return errno;
 }
-
-/* int main(int argc, char **argv) */
-/* { */
-/*   FILE *devices; */
-/*   int handlers[MAX_HANDLERS]; */
-/*   int nhandlers; */
-/*   int i; */
-
-
-/*   nhandlers = get_ev_handlers(handlers, MAX_HANDLERS, devices); */
-  
-/*   for(i = 0; i < nhandlers; i++) */
-/*     printf("Kbd eventfile: /dev/input/event%d\n", handlers[i]); */
-  
-/*   return 0; */
-
-/* err: */
-/*   return errno; */
-/* } */
