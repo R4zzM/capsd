@@ -1,80 +1,85 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <linux/input.h>
-#include <unistd.h>
+/* #include <unistd.h> */
 #include <fcntl.h>
+#include <errno.h>
+#include <sys/poll.h>
 
 int main(int argc, char** argv)
 {
-  struct input_event ev;  
-  int fd[argc + 1];
+  int nfiles = argc - 1; 
+  struct input_event ev;
+  int fd[nfiles];
   int nbytes;
-  fd_set readfds;
+  struct pollfd pfds[nfiles];
   int ret;
   int i;
-  int evnums[argc + 1];
+  int j;
+  int evnums[nfiles];
   char file[32];
   int fdmax = 0;
 
-  if(argc == 1) {
+  if(nfiles == 0) {
     printf("Need arguments!\n");
     return -1;
   }
 
-  for(i = 0; i < argc; i++) {
+  for(i = 0; i < nfiles; i++) {
     /* No error checking... */
-    evnums[i] = strtol(argv[i], NULL, 10);
+    evnums[i] = strtol(argv[i + 1], NULL, 10);
   }
 
-  FD_ZERO(&readfds);
   /* const char *file = "/dev/input/event5"; */
-  for(i = 0; i < argc; i++) {
+  for(i = 0; i < nfiles; i++) {
     snprintf(file, 32, "/dev/input/event%d", evnums[i]);
-    fd[i] = open(file, O_RDONLY);
-    if(fd[i] == -1) {
+    pfds[i].fd = open(file, O_RDONLY | O_NONBLOCK);
+    if(pfds[i].fd == -1) {
       printf("Could not open %s\n\n", file);
-      continue;
+      goto error;
     }
-    FD_SET(fd[i], &readfds);
-    printf("Opened file %s. fd = %d\n", file, fd[i]);
-    if(fdmax < fd[i]) {
-      fdmax = fd[i];
-    }
+    pfds[i].events = POLLIN;
   }
-  
+
   while(1) {
-    ret = select(fdmax + 1, &readfds, NULL, NULL, NULL);
+    printf("waiting for input...\n");
+    ret = poll(pfds, nfiles, -1);
     if(ret == -1) {
-      printf("select(...) returned with error.");
+      printf("Poll returned with an error: %s\n", strerror(errno));
+      continue;
+    } else if (!ret) {
+      printf("Could not poll file!\n");
       continue;
     } else {
-      printf("select returned...");
-    }
-    for(i = 0; i < argc; i++) {
-      if(FD_ISSET(fd[i], &readfds)) {
-        nbytes = read(fd[i], &ev, sizeof(ev));
-        if(nbytes != sizeof(ev)) {
-          // Not sure if this is possible.
-          printf("Crap. Got %d bytes but expected %lu.\n", nbytes, sizeof(ev));
-          goto err_close_file;
-        } else {
-          printf("ev.type = %u, ev.code = %u, ev.value = %u\n", ev.type, ev.code, 
-              ev.value);
+      printf("poll returned. ret = %d\n", ret);
+      for(i = 0; i < nfiles; i++) {
+        if(pfds[i].revents & POLLIN) {
+          printf("Reading fd%d: ", pfds[i].fd);
+          nbytes = read(pfds[i].fd, &ev, sizeof(ev));
+          if(nbytes == -1) {
+            if(errno == EAGAIN || errno == EWOULDBLOCK) {
+              printf("No more data to read.\n");
+              continue;
+            }
+          } else if(nbytes != sizeof(ev)) {
+            /* Probably not possible */
+            printf("Invalid event structure!\n");
+            continue;
+          } else {
+            printf("ev.type = %d, ev.code = %d, ev.value = %d\n", ev.type,
+                ev.code, ev.value);
+          }
         }
       }
     }
   }
 
-  for(i = 0; i < argc; i++) {
+  for(i = 0; i < nfiles; i++) {
     close(fd[i]);
   }
-  
+
   return 0;
 
-err_close_file:
-  for(i = 0; i < argc; i++) {
-    close(fd[i]);
-  }
-err:
+error:
   return -1;
 }
