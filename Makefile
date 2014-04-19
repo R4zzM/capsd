@@ -11,7 +11,7 @@ CFLAGS_DEBUG=
 
 # Object and source files
 OBJECTS=$(addprefix $(BUILDDIR)/, $(notdir $(SOURCES:.c=.o)))
-SOURCES=src/smartcaps.c src/devices.c 
+SOURCES=src/smartcaps.c src/devices.c src/inject.c
 # SOURCES=$(wildcard src/*.c)
 
 # Targets
