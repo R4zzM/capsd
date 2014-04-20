@@ -94,6 +94,9 @@ static int open_uinput()
 {
   int fd;
   fd = open("/dev/uinput", O_WRONLY);
+  if(fd == -1)
+    fd = open("/dev/input/uinput", O_WRONLY);
+
   return fd;
 }
 
