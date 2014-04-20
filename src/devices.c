@@ -70,7 +70,8 @@ int devices_init(struct kbdstate *s, int maxhandlers)
   int i;
   int handlers[maxhandlers];
   int nhandlers;
-
+  
+  memset(handlers, 0, maxhandlers); 
   nhandlers = ev_handler_nums(handlers, maxhandlers);
 
   npfds = 0;
@@ -82,8 +83,8 @@ int devices_init(struct kbdstate *s, int maxhandlers)
     } else {
       s->pfds[npfds].fd = fd;
       s->pfds[npfds].events = POLLIN;
-      npfds++;
       debug("Opened handler: %s, fd = %d", filename, s->pfds[npfds].fd);
+      npfds++;
     }
   }
 
