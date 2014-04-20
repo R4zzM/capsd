@@ -1,4 +1,7 @@
+#include "smartcaps.h"
+#include "dbg.h"
 #include <stdio.h>
+#include <fcntl.h>
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
@@ -15,7 +18,7 @@ static int has_kbd_handler(char *line)
     return 0;
 }
 
-// Returns the X in "eventX" in the line or -1 if the substring doesn't exist
+/* Returns the X in the "eventX" or -1 if the substring doesn't exist */
 static int ev_handler_num(char *line)
 {
   char *name;
@@ -29,7 +32,7 @@ static int ev_handler_num(char *line)
   return num;
 }
 
-int devices_event_handlers(int *handlers, int *n, int nmax)
+static int ev_handler_nums(int *handlers, int nmax)
 {
   char *abspath = "/proc/bus/input/devices";
   FILE *devices;
@@ -38,10 +41,7 @@ int devices_event_handlers(int *handlers, int *n, int nmax)
   int i = 0;
 
   devices = fopen(abspath, "r");
-  if(!devices) {
-    printf("Error when opening %s: %s\n", abspath, strerror(errno));
-    goto err;
-  }
+  check(devices, "Error when opening %s: %s\n", abspath, strerror(errno));
 
   while(fgets(line, MAX_LINE_LENGTH, devices) && i < nmax) {
     if(has_kbd_handler(line)) {
@@ -53,13 +53,41 @@ int devices_event_handlers(int *handlers, int *n, int nmax)
       i++;
     }
   }
-  *n = i;
 
   fclose(devices);
+  return i;
 
+error:
+  fclose(devices);
   return 0;
+}
 
-err:
-  fclose(devices);
-  return errno;
+int devices_init(struct kbdstate *s, int maxhandlers)
+{
+  char filename[32];
+  int npfds;
+  int fd;
+  int i;
+  int handlers[maxhandlers];
+  int nhandlers;
+
+  nhandlers = ev_handler_nums(handlers, maxhandlers);
+
+  npfds = 0;
+  for(i = 0; i < nhandlers; i++) {
+    snprintf(filename, 32, "/dev/input/event%d", handlers[i]);
+    fd = open(filename, O_RDONLY | O_NONBLOCK);
+    if(fd == -1) {
+      log_warn("Could not open handler %s", filename);
+    } else {
+      s->pfds[npfds].fd = fd;
+      s->pfds[npfds].events = POLLIN;
+      npfds++;
+      debug("Opened handler: %s, fd = %d", filename, s->pfds[npfds].fd);
+    }
+  }
+
+  s->npfds = npfds;
+
+  return npfds;
 }
