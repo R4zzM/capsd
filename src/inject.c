@@ -100,9 +100,11 @@ int inject_init()
   int ret = 0;
   int fd;
 
-  fd = open_uinput();
-  if(fd < 0)
-    goto error; 
+  ret = open_uinput();
+  if(ret < 0)
+    goto error;
+  else
+    fd = ret;
 
   ret = configure_device(fd);
   if(ret)
