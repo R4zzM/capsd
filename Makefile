@@ -17,6 +17,11 @@ SOURCES=src/smartcaps.c src/devices.c src/inject.c
 # Targets
 all: $(RELEASE)
 
+.PHONY: install
+install:
+	@mkdir -p /usr/local/bin
+	@install bin/smartcaps /usr/local/bin
+
 .PHONY: release
 release: $(RELEASE)
 
