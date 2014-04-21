@@ -41,7 +41,7 @@ static int ev_handler_nums(int *handlers, int nmax)
   int i = 0;
 
   devices = fopen(abspath, "r");
-  check(devices, "Error when opening %s: %s\n", abspath, strerror(errno));
+  check(devices, "Error when opening %s", abspath);
 
   while(fgets(line, MAX_LINE_LENGTH, devices) && i < nmax) {
     if(has_kbd_handler(line)) {
@@ -79,11 +79,11 @@ int devices_init(struct kbdstate *s, int maxhandlers)
     snprintf(filename, 32, "/dev/input/event%d", handlers[i]);
     fd = open(filename, O_RDONLY | O_NONBLOCK);
     if(fd == -1) {
-      log_warn("Could not open handler %s", filename);
+      log_warn("Could not open %s", filename);
     } else {
       s->pfds[npfds].fd = fd;
       s->pfds[npfds].events = POLLIN;
-      debug("Opened handler: %s, fd = %d", filename, s->pfds[npfds].fd);
+      debug("Opened: %s, fd = %d", filename, s->pfds[npfds].fd);
       npfds++;
     }
   }

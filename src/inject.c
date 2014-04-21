@@ -101,24 +101,17 @@ int inject_init()
   int fd;
 
   fd = open_uinput();
-  if(fd < 0) {
-    printf("Could not open device. ret = %d", fd);
+  if(fd < 0)
     goto error; 
-  }
 
   ret = configure_device(fd);
-  if(ret) {
-    printf("Could not configure device. ret = %d", ret);
+  if(ret)
     goto error_close_uinput;
-  }
 
   ret = create_device(fd);
-  if(ret) {
-    printf("Could not create device. ret = %d", ret);
+  if(ret)
     goto error_close_uinput;
-  }
 
-  debug("returning fd = %d", fd);
   return fd;
 
 error_close_uinput:
@@ -132,7 +125,7 @@ int inject_lctrl_down(int fd)
   int type = EV_KEY; 
   int code = KEY_LEFTCTRL; 
   int value = KEY_VALUE_PRESS;
-  debug("Injecting event: type=%d, code=%d, value=%d", type, code, value);
+  debug("Injecting lctrl down: type=%d, code=%d, value=%d", type, code, value);
   return inject_event(fd, type, code, value);
 }
 
@@ -141,7 +134,7 @@ int inject_lctrl_up(int fd)
   int type = EV_KEY; 
   int code = KEY_LEFTCTRL; 
   int value = KEY_VALUE_RELEASE;
-  debug("Injecting event: type=%d, code=%d, value=%d", type, code, value);
+  debug("Injecting lctrl up: type=%d, code=%d, value=%d", type, code, value);
   return inject_event(fd, type, code, value);
 }
 
@@ -150,7 +143,7 @@ int inject_escape_down(int fd)
   int type = EV_KEY; 
   int code = KEY_ESC; 
   int value = KEY_VALUE_PRESS;
-  debug("Injecting event: type=%d, code=%d, value=%d", type, code, value);
+  debug("Injecting ESC down: type=%d, code=%d, value=%d", type, code, value);
   return inject_event(fd, type, code, value);
 }
 
@@ -159,6 +152,6 @@ int inject_escape_up(int fd)
   int type = EV_KEY; 
   int code = KEY_ESC;
   int value = KEY_VALUE_RELEASE;
-  debug("Injecting event: type=%d, code=%d, value=%d", type, code, value);
+  debug("Injecting ESC up: type=%d, code=%d, value=%d", type, code, value);
   return inject_event(fd, type, code, value);
 }
