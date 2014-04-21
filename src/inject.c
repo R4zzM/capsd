@@ -48,12 +48,7 @@ static int create_device(fd)
   struct uinput_user_dev uidev;
 
   memset(&uidev, 0, sizeof(uidev));
-  
   snprintf(uidev.name, UINPUT_MAX_NAME_SIZE, "Smartcaps");
-  uidev.id.bustype = BUS_USB;
-  uidev.id.vendor = 0x045e;
-  uidev.id.product = 0x00dd;
-  uidev.id.version = 0x0111;
 
   ret = write(fd, &uidev, sizeof(uidev));
   check(ret != -1, "Failed to write to data to uniput: %s", strerror(errno));
