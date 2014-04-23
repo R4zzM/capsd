@@ -121,6 +121,7 @@ int main(int argc, char **argv)
       strerror(errno));
 
   /* Enter mainloop */
+  log_info("Init successful. Waiting for keyboard input.");
   await_keypress(injectfd, &s);
 
   return 0;
