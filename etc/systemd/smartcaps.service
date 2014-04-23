@@ -1,6 +1,6 @@
 [Unit]
 Description="Smartcaps"
-/* Documentation=man:smartcaps */
+After=sshd.service
 
 [Service]
 ExecStart=/usr/local/bin/smartcaps
