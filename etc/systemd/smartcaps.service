@@ -4,7 +4,7 @@ Documentation=man:smartcaps
 
 [Service]
 ExecStart=/usr/local/bin/smartcaps
-StandardOutput=null
+StandardOutput=journal
 
 [Install]
 WantedBy=multi-user.target
