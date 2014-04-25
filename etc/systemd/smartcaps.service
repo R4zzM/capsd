@@ -3,7 +3,7 @@ Description="Smartcaps"
 After=sshd.service
 
 [Service]
-ExecStart=/usr/local/bin/smartcaps
+ExecStart=/usr/local/bin/smartcapsd
 StandardOutput=journal
 
 [Install]

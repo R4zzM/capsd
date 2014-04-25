@@ -3,8 +3,8 @@ BUILDDIR=build
 TARGETDIR=bin
 
 # Targets and flags
-RELEASE=smartcaps
-DEBUG=smartcaps-dbg
+RELEASE=smartcapsd
+DEBUG=smartcapsd-dbg
 CFLAGS=-Wall
 CFLAGS_RELEASE=-O2 -DNDEBUG=1
 CFLAGS_DEBUG=
@@ -20,7 +20,7 @@ all: $(RELEASE)
 .PHONY: install
 install:
 	@mkdir -p /usr/local/bin
-	@install bin/smartcaps /usr/local/bin
+	@install bin/smartcapsd /usr/local/bin
 	@install -m 644 etc/systemd/smartcaps.service /etc/systemd/system/smartcaps.service
 	@systemctl enable smartcaps.service
 
