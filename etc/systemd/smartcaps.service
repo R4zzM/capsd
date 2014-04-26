@@ -1,5 +1,5 @@
 [Unit]
-Description="Smartcaps"
+Description=Smartcaps
 After=multi-user.target
 Requires=multi-user.target
 
