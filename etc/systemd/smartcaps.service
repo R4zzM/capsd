@@ -1,10 +1,11 @@
 [Unit]
 Description="Smartcaps"
-After=sshd.service
+After=multi-user.target
+Requires=multi-user.target
 
 [Service]
 ExecStart=/usr/local/bin/smartcapsd
 StandardOutput=journal
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=default.target
