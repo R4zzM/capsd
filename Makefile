@@ -21,8 +21,6 @@ all: $(RELEASE)
 install:
 	@mkdir -p /usr/local/bin
 	@install bin/smartcapsd /usr/local/bin
-	@install -m 644 etc/systemd/smartcaps.service /etc/systemd/system/smartcaps.service
-	@systemctl enable smartcaps.service
 
 .PHONY: release
 release: $(RELEASE)
