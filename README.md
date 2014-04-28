@@ -13,14 +13,13 @@ and the input subsystem.
 Requirements
 ------------
 * A Linux distro with a kernel version > 2.6.34
-* Systemd (if smartcaps should autostart)
+* Systemd (if smartcaps should run as a service)
 
 Installation
 ------------
-`make` to build  
-`sudo make install`      
+Simply run the script _install.sh_ with root permissions. You are done. 
 
-If you have a distro that does not use systemd the last step might fail as it
-tries to copy systemd unit files into a directory that doesn't exist. This will
-be remedied in the future.
-
+The script will:
+- Install smartcaps
+- Add smartcaps as a system service to start on boot
+- Start smartcaps
