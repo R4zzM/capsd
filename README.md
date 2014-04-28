@@ -10,10 +10,14 @@ Control being held down.
 Smartcaps is implemented as a Linux userspace driver and makes use of uinput
 and the input subsystem.
 
-Requirements
+Requirements 
 ------------
-* A Linux distro with a kernel version > 2.6.34
-* Systemd (if smartcaps should run as a service)
+* A Linux distro with the uinput kernel module. This module is included by
+  default in all kernels from somewhere around version 2.6.30. I don't remember
+  exactly. One of the files /dev/uinput or /dev/input/uinput should exist if
+  the uinput module exists and is correctly loaded.
+* Systemd or Upstart if smartcaps should run as a service. Most Linux
+  distributions use one of these.
 
 Installation
 ------------
@@ -21,5 +25,5 @@ Simply run the script _install.sh_ with root permissions. You are done.
 
 The script will:
 - Install smartcaps
-- Add smartcaps as a system service to start on boot
-- Start smartcaps
+- Start smartcaps as a system service
+- Make sure that smartcaps starts every time the system boots
