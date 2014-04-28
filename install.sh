@@ -3,23 +3,35 @@
 APPNAME=smartcaps
 
 detect_init_daemon() {
-  if [[ $(which systemctl > /dev/null 2>&1) -eq 0 ]]; then
-    SERVICE_DAEMON="systemd"
+  $(which systemctl > /dev/null 2>&1)
+  exitcode=$?
+  if [[ $exitcode == 0 ]]; then
+    INIT_DAEMON="systemd"
+    return
   fi
-  # elif [[ $(which initctl > /dev/null 2>&1) -eq 0 ]]; then
-  #   SERVICE_DAEMON="upstart"
+
+  $(which initctl > /dev/null 2>&1)
+  exitcode=$?
+  if [[ $exitcode == 0 ]]; then
+    INIT_DAEMON="upstart"
+    return
+  fi
 }
 
 install_service() {
-  if [[ $SERVICE_DAEMON == "systemd" ]]; then
+  if [[ $INIT_DAEMON == "systemd" ]]; then
     cp etc/systemd/$APPNAME.service /etc/systemd/system/
     systemctl enable $APPNAME
+  elif [[ $INIT_DAEMON == "upstart" ]]; then
+    cp etc/upstart/$APPNAME.conf /etc/init/
   fi
 }
 
 start_service() {
-  if [[ $SERVICE_DAEMON == "systemd" ]]; then
+  if [[ $INIT_DAEMON == "systemd" ]]; then
     systemctl start $APPNAME
+  elif [[ $INIT_DAEMON == "upstart" ]]; then
+    initctl start $APPNAME
   fi
 }
 
@@ -32,13 +44,13 @@ if [[ $(whoami) != "root" ]]; then
   exit 1
 fi
 
-echo -n "Detecting service daemon..." 
+echo -n "Detecting init daemon..." 
 detect_init_daemon
-if [[ -z $SERVICE_DAEMON ]]; then
+if [[ -z $INIT_DAEMON ]]; then
   echo "Aborted. Could not find systemd or upstart."
   exit 1
 else 
-  echo "Done. Found: $SERVICE_DAEMON"
+  echo "Done. Using: $INIT_DAEMON"
 fi
 
 echo "Building..."
