@@ -27,3 +27,9 @@ The script will:
 - Install smartcaps
 - Start smartcaps as a system service
 - Make sure that smartcaps starts every time the system boots
+
+Known Bugs
+----------
+- The device file is only read once which results in that keyboards plugged into 
+the USB-port after that smartcaps was sterted will not be detected and thus 
+the functionality of the thier caps lock key will not be altered.
