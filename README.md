@@ -31,5 +31,8 @@ The script will:
 Known Bugs
 ----------
 - The device file is only read once which results in that keyboards plugged into 
-the USB-port after that smartcaps was sterted will not be detected and thus 
-the functionality of the thier caps lock key will not be altered.
+the USB-port after smartcaps was sterted will not be detected and thus 
+the functionality of the thier caps lock key will not be altered. If a new
+keyboard is plugged in the daemon has to be restarted.
+- Functionality for filtering the Caps Lock key is not implemneted. Caps
+Lock has to be filtered manually in X or in the Console. 
