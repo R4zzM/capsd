@@ -1,19 +1,19 @@
-#include "smartcaps.h"
-#include <linux/input.h>
-#include <linux/uinput.h>
-#include <linux/ioctl.h>
 #include "dbg.h"
-#include <stdio.h>
-#include <unistd.h>
+#include "smartcaps.h"
 #include <fcntl.h>
+#include <linux/input.h>
+#include <linux/ioctl.h>
+#include <linux/uinput.h>
+#include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 
 /* Key event values are not defined in linux/input.h */
 #define KEY_VALUE_RELEASE 0
 #define KEY_VALUE_PRESS 1
 #define KEY_VALUE_REPEAT 2
 
-static int inject_event(int fd, int type, int code, int value) 
+int inject_event(int fd, int type, int code, int value) 
 {
   int ret;
   struct input_event keyevent;
@@ -32,8 +32,7 @@ static int inject_event(int fd, int type, int code, int value)
   
   debug("fd = %d", fd);
   ret = write(fd, &keyevent, sizeof(keyevent));
-  check(ret != -1, "Writing event failed: %s", strerror(errno));
-  
+  check(ret != -1, "Writing event failed: %s", strerror(errno)); 
   ret = write(fd, &synevent, sizeof(synevent));
   check(ret != -1, "Writing syn failed: %s", strerror(errno));
 
@@ -65,20 +64,19 @@ error:
 
 static int configure_device(fd) 
 {
-  int ret; 
+  int ret;
+  int i;
 
   ret = ioctl(fd, UI_SET_EVBIT, EV_KEY);
   check(ret != -1, "ioctl UI_SET_EVBIT, EV_KEY failed. %s", strerror(errno));
 
   ret = ioctl(fd, UI_SET_EVBIT, EV_SYN);
   check(ret != -1, "ioctl UI_SET_EVBIT, EV_SYN failed. %s", strerror(errno));
- 
-  ret = ioctl(fd, UI_SET_KEYBIT, KEY_LEFTCTRL);
-  check(ret != -1, "ioctl UI_SET_EVBIT, KEY_LEFTCTRL failed. %s", 
-      strerror(errno));
 
-  ret = ioctl(fd, UI_SET_KEYBIT, KEY_ESC);
-  check(ret != -1, "ioctl UI_SET_EVBIT, KEY_ESC failed. %s", strerror(errno));
+  for(i = 0; i < KEY_CNT; i++) {
+    ret = ioctl(fd, UI_SET_KEYBIT, i);
+    check(ret != -1, "ioctl UI_SET_EVBIT, %d failed. %s", i, strerror(errno));
+  }
 
   return 0;
 
@@ -123,12 +121,28 @@ error:
   return ret; 
 }
 
+int inject_forward_keypress(int fd, int code, int value)
+{
+  int type = EV_KEY;
+  debug("Injecting generic keypress: type=%d, code=%d, value=%d", type, code, value);
+  return inject_event(fd, type, code, value);
+}
+
+int inject_syn(int fd)
+{
+  int type = EV_SYN;
+  int code = 0;
+  int value = 0;
+  debug("Injecting SYN");
+  return inject_event(fd, type, code, value);
+}
+
 int inject_lctrl_down(int fd) 
 {
   int type = EV_KEY; 
   int code = KEY_LEFTCTRL; 
   int value = KEY_VALUE_PRESS;
-  debug("Injecting lctrl down: type=%d, code=%d, value=%d", type, code, value);
+  debug("Injecting LCTRL DOWN");
   return inject_event(fd, type, code, value);
 }
 
@@ -137,7 +151,7 @@ int inject_lctrl_up(int fd)
   int type = EV_KEY; 
   int code = KEY_LEFTCTRL; 
   int value = KEY_VALUE_RELEASE;
-  debug("Injecting lctrl up: type=%d, code=%d, value=%d", type, code, value);
+  debug("Injecting LCTRL UP");
   return inject_event(fd, type, code, value);
 }
 
@@ -146,7 +160,7 @@ int inject_escape_down(int fd)
   int type = EV_KEY; 
   int code = KEY_ESC; 
   int value = KEY_VALUE_PRESS;
-  debug("Injecting ESC down: type=%d, code=%d, value=%d", type, code, value);
+  debug("Injecting ESC DOWN");
   return inject_event(fd, type, code, value);
 }
 
@@ -155,6 +169,6 @@ int inject_escape_up(int fd)
   int type = EV_KEY; 
   int code = KEY_ESC;
   int value = KEY_VALUE_RELEASE;
-  debug("Injecting ESC up: type=%d, code=%d, value=%d", type, code, value);
+  debug("Injecting ESC UP");
   return inject_event(fd, type, code, value);
 }

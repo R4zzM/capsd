@@ -16,6 +16,7 @@
 int devices_init(struct kbdstate *s, int maxhandlers);
 
 /* inject.c */
+void inject_forward_keypress(int fd, int code, int value);
 void inject_escape_down(int injectfd);
 void inject_escape_up(int injectfd);
 void inject_lctrl_up(int injectfd);
@@ -38,8 +39,7 @@ static int read_event(struct pollfd pfds, struct input_event *ev)
   
   /* Unsure if this can happen */
   check(nbytes == sizeof(*ev), "Full input_event struct could not be read.");
-
-  debug("type = %u, code = %u, value = %u", ev->type, ev->code, ev->value);
+  debug("fd = %d, type = %u, code = %u, value = %u", pfds.fd, ev->type, ev->code, ev->value);
 
 out:
   return 0;
@@ -58,6 +58,8 @@ static void handle_keypress(int injectfd, struct kbdstate s,
     } 
   } else if(ev.type == EV_KEY && ev.code == KEY_CAPSLOCK && ev.value == 1) {
     inject_lctrl_down(injectfd);
+  } else if(ev.type == EV_KEY) {
+    inject_forward_keypress(injectfd, ev.code, ev.value);
   }
 }
 
@@ -86,10 +88,8 @@ static void await_keypress(int injectfd, struct kbdstate *s)
       log_err("Poll returned with an error: %s", strerror(errno));
       continue;
     }
-    debug("Reading input from %d files.", ret);
     for(i = 0; i < s->npfds; i++) {
       if((s->pfds[i].revents & POLLIN)) {
-        debug("Got keypress for fd%d",s->pfds[i].fd);
         ret = read_event(s->pfds[i], &ev);
         if(ret == -1) {
           log_err("Error when reading event: %s", strerror(errno));

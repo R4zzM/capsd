@@ -1,10 +1,13 @@
-#include "smartcaps.h"
 #include "dbg.h"
-#include <stdio.h>
+#include "smartcaps.h"
+#include <errno.h>
 #include <fcntl.h>
+#include <linux/ioctl.h>
+#include <linux/input.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <errno.h>
+#include <unistd.h>
 
 #define MAX_LINES 512
 #define MAX_LINE_LENGTH 512
@@ -12,7 +15,7 @@
 
 static int has_kbd_handler(char *line)
 {
-  if(line[0] == 'H' && line[1] == ':' && strstr(line, "kbd"))
+  if(line[0] == 'H' && line[1] == ':' && strstr(line, "sysrq"))
     return 1;
   else
     return 0;
@@ -81,6 +84,14 @@ int devices_init(struct kbdstate *s, int maxhandlers)
     if(fd == -1) {
       log_warn("Could not open %s", filename);
     } else {
+      // Grab the device for exclusive use
+      if(handlers[i] == 2){
+        if(ioctl(fd, EVIOCGRAB, 1) == -1) {
+          log_warn("Could not grab device %s. %s", filename, strerror(errno));
+          close(fd);
+          continue;
+        }
+      }
       s->pfds[npfds].fd = fd;
       s->pfds[npfds].events = POLLIN;
       debug("Opened: %s, fd = %d", filename, s->pfds[npfds].fd);
