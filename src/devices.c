@@ -84,14 +84,11 @@ int devices_init(struct kbdstate *s, int maxhandlers)
     if(fd == -1) {
       log_warn("Could not open %s", filename);
     } else {
-      // Grab the device for exclusive use
-      if(handlers[i] == 2){
         if(ioctl(fd, EVIOCGRAB, 1) == -1) {
           log_warn("Could not grab device %s. %s", filename, strerror(errno));
           close(fd);
           continue;
         }
-      }
       s->pfds[npfds].fd = fd;
       s->pfds[npfds].events = POLLIN;
       debug("Opened: %s, fd = %d", filename, s->pfds[npfds].fd);

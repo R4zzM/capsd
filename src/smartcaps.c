@@ -113,6 +113,7 @@ int main(int argc, char **argv)
   s.capsdown = 0;
   s.lastcode = 0;
 
+  sleep(1); /* Delay startup to avoid eventloops on USB kbds */
   s.npfds = devices_init(&s, MAX_HANDLERS);
   check(s.npfds, "No handlers were opened. Exiting.");
 
