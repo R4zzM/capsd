@@ -5,7 +5,7 @@ Among Vim users there are two destinct schools of how to handle the Caps Lock
 key: Remap it to escape or remap it to control.  The aim of Smartcaps is to not
 make these schools mutually exclusive: Tapping Caps Lock will result in an
 Escape press and holding Caps Lock while pressing another key results in
-Control being held down.
+Control being held down.  
 
 Smartcaps is implemented as a Linux userspace driver and makes use of uinput
 and the input subsystem.
@@ -34,5 +34,3 @@ Known Bugs
 the USB-port after smartcaps was sterted will not be detected and thus 
 the functionality of the thier caps lock key will not be altered. If a new
 keyboard is plugged in the daemon has to be restarted.
-- Functionality for filtering the Caps Lock key is not implemneted. Caps
-Lock has to be filtered manually in X or in the Console. 
