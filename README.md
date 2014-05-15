@@ -30,10 +30,3 @@ The script will:
 - Start capsd as a system service
 - Make sure that capsd starts every time the system boots
 
-Known Bugs
-----------
-
-- The device file is only read once which results in that keyboards plugged
-  into the USB-port after capsd was sterted will not be detected and thus the
-  functionality of the thier caps lock key will not be altered. If a new
-  keyboard is plugged in the daemon has to be restarted.
