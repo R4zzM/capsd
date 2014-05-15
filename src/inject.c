@@ -1,5 +1,5 @@
 #include "dbg.h"
-#include "smartcaps.h"
+#include "capsd.h"
 #include <fcntl.h>
 #include <linux/input.h>
 #include <linux/ioctl.h>

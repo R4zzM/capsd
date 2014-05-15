@@ -3,7 +3,7 @@
 
 #include <sys/poll.h>
 
-#define PROGRAMNAME "Smartcaps"
+#define PROGRAMNAME "capsd"
 
 struct kbdstate {
     struct pollfd *pfds; /* Filedescriptors to use with poll system call */

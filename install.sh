@@ -1,6 +1,6 @@
 #!/bin/bash
 
-APPNAME=smartcaps
+APPNAME=capsd
 
 detect_init_daemon() {
   $(which systemctl > /dev/null 2>&1)

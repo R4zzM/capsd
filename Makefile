@@ -3,15 +3,15 @@ BUILDDIR=build
 TARGETDIR=bin
 
 # Targets and flags
-RELEASE=smartcapsd
-DEBUG=smartcapsd-dbg
+RELEASE=capsd
+DEBUG=capsd-dbg
 CFLAGS=-Wall
 CFLAGS_RELEASE=-O2 -DNDEBUG=1
 CFLAGS_DEBUG=
 
 # Object and source files
 OBJECTS=$(addprefix $(BUILDDIR)/, $(notdir $(SOURCES:.c=.o)))
-SOURCES=src/smartcaps.c src/devices.c src/inject.c
+SOURCES=src/capsd.c src/devices.c src/inject.c
 # SOURCES=$(wildcard src/*.c)
 
 # Targets
@@ -20,7 +20,7 @@ all: $(RELEASE)
 .PHONY: install
 install:
 	@mkdir -p /usr/local/bin
-	@install bin/smartcapsd /usr/local/bin
+	@install bin/capsd /usr/local/bin
 
 .PHONY: release
 release: $(RELEASE)
